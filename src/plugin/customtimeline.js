@@ -358,8 +358,8 @@ export default class TimelineCustomPlugin {
         // build an array of index, second, and pixel data
         const positioning1 = [];
         for (ii = 0; ii < measureLabelTimes.length; ii++){
-            positioning1.push([ii, measureLabelTimes[ii], curPixel1]);
             curPixel1 = pixelsPerSecond * measureLabelTimes[ii];
+            positioning1.push([ii, measureLabelTimes[ii], curPixel1]);
         }
 
         // iterate over each position
@@ -374,8 +374,8 @@ export default class TimelineCustomPlugin {
         // build an array of index, second, and pixel data
         const positioning2 = [];
         for (iii = 0; iii < beatLabelTimes.length; iii++){
-            positioning2.push([iii, beatLabelTimes[iii], curPixel2]);
             curPixel2 = pixelsPerSecond * beatLabelTimes[iii];
+            positioning2.push([iii, beatLabelTimes[iii], curPixel2]);
         }
 
         // iterate over each position
@@ -506,7 +506,7 @@ export default class TimelineCustomPlugin {
      * @returns {number} Time
      */
     defaultFormatLabelCallback(seconds, pxPerSec, index) {
-        return index;
+        return index+1;
     }
 
     /**
