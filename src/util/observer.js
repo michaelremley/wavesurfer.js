@@ -122,8 +122,13 @@ export default class Observer {
      * @param {...any} args The arguments with which to call the listeners
      */
     fireEvent(event, ...args) {
-        if (!this.handlers || this._disabledEventEmissions.includes(event)) {
+        if (!this.handlers) {
             return;
+        }
+        if (this._disabledEventEmissions){
+            if (this._disabledEventEmissions.includes(event)){
+                return;
+            }
         }
 
         const handlers = this.handlers[event];

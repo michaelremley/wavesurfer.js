@@ -70,7 +70,7 @@ export class Region {
                 this.marginTop = this.wavesurfer.getHeight() * channelIdx + 'px';
             }
         }
-        
+
         this.formatTimeCallback = params.formatTimeCallback;
 
         this.bindInOut();
@@ -183,15 +183,15 @@ export class Region {
 
         /* Resize handles */
         if (this.resize) {
-            const handleLeft = regionEl.appendChild(
+            this.handleLeft = regionEl.appendChild(
                 document.createElement('handle')
             );
-            const handleRight = regionEl.appendChild(
+            this.handleRight = regionEl.appendChild(
                 document.createElement('handle')
             );
 
-            handleLeft.className = 'wavesurfer-handle wavesurfer-handle-start';
-            handleRight.className = 'wavesurfer-handle wavesurfer-handle-end';
+            this.handleLeft.className = 'wavesurfer-handle wavesurfer-handle-start';
+            this.handleRight.className = 'wavesurfer-handle wavesurfer-handle-end';
 
             // Default CSS properties for both handles.
             const css = {
@@ -219,11 +219,11 @@ export class Region {
                     : null;
 
             if (handleLeftCss) {
-                this.style(handleLeft, handleLeftCss);
+                this.style(this.handleLeft, handleLeftCss);
             }
 
             if (handleRightCss) {
-                this.style(handleRight, handleRightCss);
+                this.style(this.handleRight, handleRightCss);
             }
         }
 
@@ -293,6 +293,45 @@ export class Region {
                     'data-region-' + attrname,
                     this.attributes[attrname]
                 );
+            }
+
+            /* Restyle/resize handles */
+            if (this.resize) {
+                this.handleLeft.className = 'wavesurfer-handle wavesurfer-handle-start';
+                this.handleRight.className = 'wavesurfer-handle wavesurfer-handle-end';
+
+                // Default CSS properties for both handles.
+                const css = {
+                    cursor: 'col-resize',
+                    position: 'absolute',
+                    top: '0px',
+                    width: '1%',
+                    maxWidth: '4px',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 1)'
+                };
+
+                // Merge CSS properties per handle.
+                const handleLeftCss =
+                    this.handleStyle.left !== 'none'
+                        ? Object.assign({ left: '0px' }, css, this.handleStyle.left)
+                        : null;
+                const handleRightCss =
+                    this.handleStyle.right !== 'none'
+                        ? Object.assign(
+                            { right: '0px' },
+                            css,
+                            this.handleStyle.right
+                        )
+                        : null;
+
+                if (handleLeftCss) {
+                    this.style(this.handleLeft, handleLeftCss);
+                }
+
+                if (handleRightCss) {
+                    this.style(this.handleRight, handleRightCss);
+                }
             }
 
             this.element.title = this.formatTime(this.start, this.end);
