@@ -20,12 +20,10 @@
  * @property {number} fontSize=10 Font size of labels in pixels
  * @property {?number} duration Length of the track in seconds. Overrides
  * getDuration() for setting length of timeline
- * @property {function} formatTimeCallback (sec, pxPerSec) -> label
- * @property {function} timeInterval (pxPerSec) -> seconds between notches
- * @property {function} primaryLabelInterval (pxPerSec) -> cadence between
- * labels in primary color
- * @property {function} secondaryLabelInterval (pxPerSec) -> cadence between
- * labels in secondary color
+ * @property {function} measureLabelTimes -> function that returns measure times
+ * to label
+ * @property {function} beatLabelTimes -> function that returns beat times to
+ * label
  * @property {?number} offset Offset for the timeline start in seconds. May also be
  * negative.
  * @property {?boolean} deferInit Set to true to manually call
@@ -144,15 +142,14 @@ export default class TimelineCustomPlugin {
                 primaryColor: '#000',
                 secondaryColor: '#c0c0c0',
                 primaryFontColor: '#000',
-                secondaryFontColor: '#000',
+                secondaryFontColor: '#c0c0c0',
                 fontFamily: 'Arial',
                 fontSize: 10,
                 duration: null,
                 zoomDebounce: false,
-                formatTimeCallback: this.defaultFormatTimeCallback,
-                timeInterval: this.defaultTimeInterval,
-                primaryLabelInterval: this.defaultPrimaryLabelInterval,
-                secondaryLabelInterval: this.defaultSecondaryLabelInterval,
+                formatLabelCallback: this.defaultFormatLabelCallback,
+                measureLabelTimes: this.defaultMeasureLabelTimes,
+                beatLabelTimes: this.defaultBeatLabelTimes,
                 offset: 0
             },
             params
@@ -352,77 +349,66 @@ export default class TimelineCustomPlugin {
             this.pixelRatio;
         const pixelsPerSecond = width / duration;
 
-        const formatTime = this.params.formatTimeCallback;
-        // if parameter is function, call the function with
-        // pixelsPerSecond, otherwise simply take the value as-is
-        const intervalFnOrVal = option =>
-            typeof option === 'function' ? option(pixelsPerSecond) : option;
-        const timeInterval = intervalFnOrVal(this.params.timeInterval);
-        const primaryLabelInterval = intervalFnOrVal(
-            this.params.primaryLabelInterval
-        );
-        const secondaryLabelInterval = intervalFnOrVal(
-            this.params.secondaryLabelInterval
-        );
+        const formatLabel = this.params.formatLabelCallback;
+        const measureLabelTimes = this.params.measureLabelTimes();
+        const beatLabelTimes = this.params.beatLabelTimes();
 
-        let curPixel = pixelsPerSecond * this.params.offset;
-        let curSeconds = 0;
-        let i;
-        // build an array of position data with index, second and pixel data,
-        // this is then used multiple times below
-        const positioning = [];
-        for (i = 0; i < totalSeconds / timeInterval; i++) {
-            positioning.push([i, curSeconds, curPixel]);
-            curSeconds += timeInterval;
-            curPixel += pixelsPerSecond * timeInterval;
+        let curPixel1 = pixelsPerSecond * this.params.offset;
+        let ii;
+        // build an array of index, second, and pixel data
+        const positioning1 = [];
+        for (ii = 0; ii < measureLabelTimes.length; ii++){
+            positioning1.push([ii, measureLabelTimes[ii], curPixel1]);
+            curPixel1 = pixelsPerSecond * measureLabelTimes[ii];
         }
 
         // iterate over each position
-        const renderPositions = cb => {
-            positioning.forEach(pos => {
+        const renderPositions1 = cb => {
+            positioning1.forEach(pos => {
                 cb(pos[0], pos[1], pos[2]);
             });
         };
 
-        // render primary labels
-        this.setFillStyles(this.params.primaryColor);
-        this.setFonts(`${fontSize}px ${this.params.fontFamily}`);
-        this.setFillStyles(this.params.primaryFontColor);
-        renderPositions((i, curSeconds, curPixel) => {
-            if (i % primaryLabelInterval === 0) {
-                this.fillRect(curPixel, 0, 1, height1);
-                this.fillText(
-                    formatTime(curSeconds, pixelsPerSecond),
-                    curPixel + this.params.labelPadding * this.pixelRatio,
-                    height1
-                );
-            }
-        });
+        let curPixel2 = pixelsPerSecond * this.params.offset;
+        let iii;
+        // build an array of index, second, and pixel data
+        const positioning2 = [];
+        for (iii = 0; iii < beatLabelTimes.length; iii++){
+            positioning2.push([iii, beatLabelTimes[iii], curPixel2]);
+            curPixel2 = pixelsPerSecond * beatLabelTimes[iii];
+        }
 
-        // render secondary labels
+        // iterate over each position
+        const renderPositions2 = cb => {
+            positioning2.forEach(pos => {
+                cb(pos[0], pos[1], pos[2]);
+            });
+        };
+
+        // render beat labels
         this.setFillStyles(this.params.secondaryColor);
         this.setFonts(`${fontSize}px ${this.params.fontFamily}`);
         this.setFillStyles(this.params.secondaryFontColor);
-        renderPositions((i, curSeconds, curPixel) => {
-            if (i % secondaryLabelInterval === 0) {
-                this.fillRect(curPixel, 0, 1, height1);
-                this.fillText(
-                    formatTime(curSeconds, pixelsPerSecond),
-                    curPixel + this.params.labelPadding * this.pixelRatio,
-                    height1
-                );
-            }
+        renderPositions2((iii, beatLabelTimes, curPixel2) => {
+            this.fillRect(curPixel2, 0, 1, height2);
+            this.fillText(
+                formatLabel(beatLabelTimes, pixelsPerSecond, iii),
+                curPixel2 + this.params.labelPadding * this.pixelRatio,
+                height2/2
+            );
         });
 
-        // render the actual notches (when no labels are used)
-        this.setFillStyles(this.params.unlabeledNotchColor);
-        renderPositions((i, curSeconds, curPixel) => {
-            if (
-                i % secondaryLabelInterval !== 0 &&
-                i % primaryLabelInterval !== 0
-            ) {
-                this.fillRect(curPixel, 0, 1, height2);
-            }
+        // render measure labels
+        this.setFillStyles(this.params.primaryColor);
+        this.setFonts(`${fontSize}px ${this.params.fontFamily}`);
+        this.setFillStyles(this.params.primaryFontColor);
+        renderPositions1((ii, measureLabelTimes, curPixel1) => {
+            this.fillRect(curPixel1, 0, 1, height1);
+            this.fillText(
+                formatLabel(measureLabelTimes, pixelsPerSecond, ii),
+                curPixel1 + this.params.labelPadding * this.pixelRatio,
+                height1
+            );
         });
     }
 
@@ -516,68 +502,28 @@ export default class TimelineCustomPlugin {
      *
      * @param {number} seconds Seconds to format
      * @param {number} pxPerSec Pixels per second
+     * @param {number} index Index of label
      * @returns {number} Time
      */
-    defaultFormatTimeCallback(seconds, pxPerSec) {
-        if (seconds / 60 > 1) {
-            // calculate minutes and seconds from seconds count
-            const minutes = parseInt(seconds / 60, 10);
-            seconds = parseInt(seconds % 60, 10);
-            // fill up seconds with zeroes
-            seconds = seconds < 10 ? '0' + seconds : seconds;
-            return `${minutes}:${seconds}`;
-        }
-        return Math.round(seconds * 1000) / 1000;
+    defaultFormatLabelCallback(seconds, pxPerSec, index) {
+        return index;
     }
 
     /**
-     * Return how many seconds should be between each notch
+     * Return a default set of notches to plot for measures.
      *
-     * @param {number} pxPerSec Pixels per second
-     * @returns {number} Time
+     * @returns {number} array
      */
-    defaultTimeInterval(pxPerSec) {
-        if (pxPerSec >= 25) {
-            return 1;
-        } else if (pxPerSec * 5 >= 25) {
-            return 5;
-        } else if (pxPerSec * 15 >= 25) {
-            return 15;
-        }
-        return Math.ceil(0.5 / pxPerSec) * 60;
+    defaultMeasureLabelTimes(){
+        return ([0,1]);
     }
 
     /**
-     * Return the cadence of notches that get labels in the primary color.
+     * Return a default set of notches to plot for beats.
      *
-     * @param {number} pxPerSec Pixels per second
-     * @returns {number} Cadence
+     * @returns {number} array
      */
-    defaultPrimaryLabelInterval(pxPerSec) {
-        if (pxPerSec >= 25) {
-            return 10;
-        } else if (pxPerSec * 5 >= 25) {
-            return 6;
-        } else if (pxPerSec * 15 >= 25) {
-            return 4;
-        }
-        return 4;
-    }
-
-    /**
-     * Return the cadence of notches that get labels in the secondary color.
-     *
-     * @param {number} pxPerSec Pixels per second
-     * @returns {number} Cadence
-     */
-    defaultSecondaryLabelInterval(pxPerSec) {
-        if (pxPerSec >= 25) {
-            return 5;
-        } else if (pxPerSec * 5 >= 25) {
-            return 2;
-        } else if (pxPerSec * 15 >= 25) {
-            return 2;
-        }
-        return 2;
+    defaultBeatLabelTimes(){
+        return ([0,1,2,3]);
     }
 }
