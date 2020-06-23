@@ -390,7 +390,7 @@ export default class TimelineCustomPlugin {
         this.setFonts(`${fontSize}px ${this.params.fontFamily}`);
         this.setFillStyles(this.params.secondaryFontColor);
         renderPositions2((iii, beatLabelTimes, curPixel2) => {
-            this.fillRect(curPixel2, 0, 1, height2);
+            this.fillRect(curPixel2, 2, 1, height2);
             this.fillText(
                 formatLabel(beatLabelTimes, pixelsPerSecond, iii),
                 curPixel2 + this.params.labelPadding * this.pixelRatio,
@@ -403,7 +403,7 @@ export default class TimelineCustomPlugin {
         this.setFonts(`${fontSize}px ${this.params.fontFamily}`);
         this.setFillStyles(this.params.primaryFontColor);
         renderPositions1((ii, measureLabelTimes, curPixel1) => {
-            this.fillRect(curPixel1, 0, 1, height1);
+            this.fillRect(curPixel1, 2, 1, height1);
             this.fillText(
                 formatLabel(measureLabelTimes, pixelsPerSecond, ii),
                 curPixel1 + this.params.labelPadding * this.pixelRatio,
