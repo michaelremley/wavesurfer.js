@@ -331,11 +331,11 @@ export class Region {
                         : null;
 
                 if (handleLeftCss) {
-                    this.style(this.handleLeft, handleLeftCss);
+                    this.style(this.handleLeftEl, handleLeftCss);
                 }
 
                 if (handleRightCss) {
-                    this.style(this.handleRight, handleRightCss);
+                    this.style(this.handleRightEl, handleRightCss);
                 }
             }
 
