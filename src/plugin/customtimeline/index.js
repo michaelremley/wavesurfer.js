@@ -515,7 +515,7 @@ export default class TimelineCustomPlugin {
      * @returns {number} array
      */
     defaultMeasureLabelTimes(){
-        return ([0,1]);
+        return ([0, 1]);
     }
 
     /**
@@ -524,6 +524,6 @@ export default class TimelineCustomPlugin {
      * @returns {number} array
      */
     defaultBeatLabelTimes(){
-        return ([0,1,2,3]);
+        return ([0, 1, 2, 3]);
     }
 }
