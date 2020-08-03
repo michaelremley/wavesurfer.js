@@ -302,8 +302,8 @@ export class Region {
 
             /* Restyle/resize handles */
             if (this.resize) {
-                this.handleLeft.className = 'wavesurfer-handle wavesurfer-handle-start';
-                this.handleRight.className = 'wavesurfer-handle wavesurfer-handle-end';
+                this.handleLeftEl.className = 'wavesurfer-handle wavesurfer-handle-start';
+                this.handleRightEl.className = 'wavesurfer-handle wavesurfer-handle-end';
 
                 // Default CSS properties for both handles.
                 const css = {
