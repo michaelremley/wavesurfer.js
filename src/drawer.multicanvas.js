@@ -465,7 +465,7 @@ export default class MultiCanvas extends Drawer {
                 const channels = peaks;
 
                 if (this.params.splitChannels) {
-                    const filteredChannels =  channels.filter((c, i) => !this.hideChannel(i));
+                    const filteredChannels = channels.filter((c, i) => !this.hideChannel(i));
                     if (!this.params.splitChannelsOptions.overlay) {
                         this.setHeight(
                             Math.max(filteredChannels.length, 1) *
@@ -510,7 +510,7 @@ export default class MultiCanvas extends Drawer {
                 offsetY: offsetY,
                 halfH: halfH,
                 peaks: peaks,
-                channelIndex: channelIndex,
+                channelIndex: channelIndex
             });
         })();
     }

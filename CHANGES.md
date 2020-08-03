@@ -1,11 +1,36 @@
 wavesurfer.js changelog
 =======================
 
-4.0.0 (21.06.2020)
+Next (unreleased)
+-----------------
+
+- Don't call HTMLMediaElement#load when given peaks and preload == 'none'.
+  Prevents browsers from pre-fetching audio (#1969, #1990)
+- Remove `util.extend`: deprecated since v3.3.0 (#1995)
+- Regions plugin:
+  - Removed 'col-resize' cursor when resize is disabled (#1985)
+  - Improved and unified loop playback logic (#1868)
+  - Check `minLength` before resizing region (#2001)
+  - Dragging and resizing will continue outside canvas (#2006)
+  - Revert PR #1926 click propagation on regions. Use event parameter passed in `region-click` if you need stopPropagation. (#2024)
+- Microphone plugin: move to separate directory (#1997)
+- Minimap plugin: move plugin to separate directory (#1999)
+- Cursor plugin: move plugin to separate directory (#1998)
+- Elan plugin: move plugin to separate directory (#2019)
+- Spectrogram plugin: move to separate directory (#1996)
+- Mediasession plugin: move to separate directory (#2020)
+- Timeline plugin: move to separate directory (#2018)
+- Remove `util.ajax`: deprecated since v3.0.0 (#2033)
+
+4.0.1 (23.06.2020)
 ------------------
 
 - Fixes for event handling with certain plugins (regions, microphone).
-  The crash would have involved '_disabledEventEmissions'
+  The crash would have involved '_disabledEventEmissions' (#1975)
+
+4.0.0 (21.06.2020)
+------------------
+
 - Fixed mediaelement-webaudio playback under Safari (#1964)
 - Fixed the `destroy` method of the `MediaElementWebAudio` backend. Instead of
   destroying only the media element, the audio nodes are disconnected and the
