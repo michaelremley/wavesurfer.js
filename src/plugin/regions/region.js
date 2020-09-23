@@ -182,7 +182,7 @@ export class Region {
 
         this.style(regionEl, {
             position: 'absolute',
-            zIndex: 2,
+            zIndex: 3,
             height: this.regionHeight,
             top: this.marginTop
         });
