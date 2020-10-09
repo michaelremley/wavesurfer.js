@@ -156,6 +156,7 @@ export default class TimelineCustomPlugin {
         );
 
         this.canvases = [];
+        this.canvascontexts = [];
         this.wrapper = null;
         this.drawer = null;
         this.pixelRatio = null;
@@ -260,6 +261,7 @@ export default class TimelineCustomPlugin {
             document.createElement('canvas')
         );
         this.canvases.push(canvas);
+        this.canvascontexts.push(canvas.getContext('2d'));
         this.util.style(canvas, {
             position: 'absolute',
             zIndex: 4
@@ -272,6 +274,7 @@ export default class TimelineCustomPlugin {
      */
     removeCanvas() {
         const canvas = this.canvases.pop();
+        var context = this.canvascontexts.pop();
         canvas.parentElement.removeChild(canvas);
     }
 
@@ -394,7 +397,7 @@ export default class TimelineCustomPlugin {
             this.fillText(
                 formatLabel(beatLabelTimes, pixelsPerSecond, iii),
                 curPixel2 + this.params.labelPadding * this.pixelRatio,
-                height2/2
+                height2 / 2
             );
         });
 
@@ -419,8 +422,8 @@ export default class TimelineCustomPlugin {
      * use
      */
     setFillStyles(fillStyle) {
-        this.canvases.forEach(canvas => {
-            canvas.getContext('2d').fillStyle = fillStyle;
+        this.canvascontexts.forEach(context => {
+            context.fillStyle = fillStyle;
         });
     }
 
@@ -430,8 +433,8 @@ export default class TimelineCustomPlugin {
      * @param {DOMString} font Font to use
      */
     setFonts(font) {
-        this.canvases.forEach(canvas => {
-            canvas.getContext('2d').font = font;
+        this.canvascontexts.forEach(context => {
+            context.font = font;
         });
     }
 
@@ -457,8 +460,7 @@ export default class TimelineCustomPlugin {
             };
 
             if (intersection.x1 < intersection.x2) {
-                canvas
-                    .getContext('2d')
+                this.canvascontexts[i]
                     .fillRect(
                         intersection.x1 - leftOffset,
                         intersection.y1,
@@ -477,11 +479,10 @@ export default class TimelineCustomPlugin {
      * @param {number} y Y-position
      */
     fillText(text, x, y) {
-        let textWidth;
+        let textWidth = 30;
         let xOffset = 0;
 
-        this.canvases.forEach(canvas => {
-            const context = canvas.getContext('2d');
+        this.canvascontexts.forEach(context => {
             const canvasWidth = context.canvas.width;
 
             if (xOffset > x + textWidth) {
@@ -489,7 +490,6 @@ export default class TimelineCustomPlugin {
             }
 
             if (xOffset + canvasWidth > x) {
-                textWidth = context.measureText(text).width;
                 context.fillText(text, x - xOffset, y);
             }
 
@@ -506,7 +506,7 @@ export default class TimelineCustomPlugin {
      * @returns {number} Time
      */
     defaultFormatLabelCallback(seconds, pxPerSec, index) {
-        return index+1;
+        return index + 1;
     }
 
     /**
